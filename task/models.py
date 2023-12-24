@@ -66,6 +66,7 @@ def create_project_notification(sender, instance, created, **kwargs):
         async_to_sync(channel_layer.group_send)(
             f"notification_{user_to_notify.id}",
             {
+                'command':'task_status',
                 'type': 'send_notification',
                 'message': json.dumps(serialized_notification)
             }

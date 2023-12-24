@@ -17,7 +17,9 @@ from channels.layers import get_channel_layer
 import json
 from asgiref.sync import async_to_sync
 from notification.serializers import NotificationSerializer
-from notifications.signals import notify
+# from notifications.signals import notify
+
+
 
 def test(request):
     test_func.delay()
@@ -43,6 +45,8 @@ def test_notification(request):
         }
     )
     return HttpResponse("Notification send")
+
+
 
 
 class TaskView(ListCreateAPIView):
@@ -87,24 +91,28 @@ class TaskRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     # permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     lookup_field = 'pk'
-    def perform_update(self, serializer):
-        channel_layer = get_channel_layer()
-
-        last_notification = Notification.objects.order_by('-timestamp').first()
-
-        serializer = NotificationSerializer(last_notification)
-        serialized_notification = serializer.data
-        
-        async_to_sync(channel_layer.group_send)(
-            f"notification_1",
-            {
-                'command':'task_status',
-                'type': 'send_notification',
-                'message': json.dumps('Task Completed from user')
-            }
-        )
+    
     def get_serializer_class(self):
         return TaskListSerializer if self.request.method == 'GET' else TaskSerializer
+    
+    def perform_update(self,serializer):
+        instance = serializer.save()
+        if not self.request.user.is_superuser:
+            channel_layer = get_channel_layer()
+
+            last_notification = Notification.objects.order_by('-timestamp').first()
+
+            serializer = NotificationSerializer(last_notification)
+            serialized_notification = serializer.data
+            
+            async_to_sync(channel_layer.group_send)(
+                f"notification_{instance.assigned_to}",
+                {
+                    'command':'task_status',
+                    'type': 'send_notification',
+                    'message': json.dumps(serialized_notification)
+                }
+            )
     def perform_destroy(self, instance):
         # Instead of deleting, update the deleted_at field
         instance.deleted_at = datetime.datetime.now().date()  # Make sure to import timezone

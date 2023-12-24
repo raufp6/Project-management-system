@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'api',
     'users',
     'client',
@@ -56,7 +57,7 @@ INSTALLED_APPS = [
     'notifications',
     'channels',
     'django_celery_results',
-    'django_celery_beat'
+    'django_celery_beat',
 
 ]
 REST_FRAMEWORK = {
@@ -65,7 +66,10 @@ REST_FRAMEWORK = {
         # "api.authentication.TokenAuthentication",
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 5
+
     
  
 }

@@ -8,6 +8,14 @@ import datetime
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsStaffPermission
 from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework.pagination import PageNumberPagination
+
+
+# class LargeResultsSetPagination(PageNumberPagination):
+#     page_size = 1000
+#     page_size_query_param = 'page_size'
+#     max_page_size = 10000
+    
 
 class ProjectView(ListCreateAPIView):
     serializer_class = ProjectSerializer
@@ -16,6 +24,7 @@ class ProjectView(ListCreateAPIView):
     filterset_fields = '__all__' 
     search_fields = ['^name','^description']
     permission_classes = [IsStaffPermission]
+    # pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         user = self.request.user
