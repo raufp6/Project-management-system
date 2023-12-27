@@ -1,11 +1,8 @@
 from rest_framework import serializers
 from .models import Client
 from users.models import CustomUser
+from users.serializers import UserCreationSerializer
 
-class UserCreationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'password', 'email']
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -25,7 +22,7 @@ class ClientListSerializer(serializers.ModelSerializer):
 
 
 
-class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'password')

@@ -28,16 +28,12 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-# class Department(models.Model):
-#     name = models.CharField(max_length=50)    
 
-# class Designation(models.Model):
-#     name = models.CharField(max_length=50)
 
 
 class Employee(models.Model):
     emp_id = models.CharField(default=uuid.uuid4().hex[:10].upper(), max_length=50, editable=False)
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None,related_name="user")
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=20, default=None,null=True,blank=True)

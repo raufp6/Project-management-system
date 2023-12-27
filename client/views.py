@@ -2,7 +2,8 @@ from rest_framework import viewsets,filters
 from rest_framework.response import Response
 from .models import Client
 from .models import CustomUser
-from .serializers import ClientSerializer,UserCreationSerializer
+from .serializers import ClientSerializer
+from users.serializers import UserCreationSerializer
 from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView
 import datetime
 from rest_framework import permissions,authentication
