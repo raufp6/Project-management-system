@@ -4,13 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer
-from .models import CustomUser
+from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer,EmployeeSerializer
+from .models import CustomUser,Employee
 from django.contrib.auth.models import Group
 import datetime
 from rest_framework.permissions import IsAuthenticated
 from api.permissions import IsStaffPermission
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import PermissionDenied
 
 
 class GroupViewSet(ListCreateAPIView):
@@ -55,6 +56,25 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         # Instead of deleting, update the deleted_at field
         instance.deleted_at = datetime.datetime.now().date()  # Make sure to import timezone
         instance.save()
+
+class EmployeeViewSet(ListCreateAPIView):
+    serializer_class = EmployeeSerializer
+    queryset = Employee.objects.all()
+    lookup_field = 'pk'
+    permission_classes = [IsStaffPermission]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter]
+    filterset_fields = ['first_name','last_name','status']
+    # search_fields = ['^first_name','^last_name']
+    # exclude = ('profile_pic')
+
+    def perform_create(self, serializer):
+
+        if not self.request.user.is_emp:
+
+            raise PermissionDenied('Only staff members can add employees.')
+
+        serializer.save()
+
 
 
 @api_view(['GET'])

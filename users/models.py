@@ -35,25 +35,27 @@ class CustomUser(AbstractUser):
 #     name = models.CharField(max_length=50)
 
 
-# class Employee(models.Model):
-#     emp_id = models.CharField(primary_key=True, default=uuid.uuid4().hex[:5].upper(), max_length=50, editable=False)
-#     user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None)
-#     first_name = models.CharField(max_length=50)
-#     last_name = models.CharField(max_length=50)
-#     phone = models.CharField(max_length=20, default=None,null=True,blank=True)
-#     profile_pic = models.ImageField(upload_to="uploads/emp//% Y/% m/% d/")
-#     joined_date = models.DateField(null=True,blank=True)
-#     status = models.BooleanField(default=True)
-#     created_at = models.DateTimeField(null=True, blank=True,auto_now_add=True)
-#     updated_at = models.DateField(null=True,blank=True,auto_now=True)
-#     deleted_at = models.DateField(null=True,blank=True)
+class Employee(models.Model):
+    emp_id = models.CharField(default=uuid.uuid4().hex[:10].upper(), max_length=50, editable=False)
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None,related_name="user")
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone = models.CharField(max_length=20, default=None,null=True,blank=True)
+    profile_pic = models.ImageField(upload_to="uploads/emp/",default="uploads/user.png")
+    joined_date = models.DateField(null=True,blank=True)
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(null=True, blank=True,auto_now_add=True)
+    updated_at = models.DateField(null=True,blank=True,auto_now=True)
+    deleted_at = models.DateField(null=True,blank=True)
+    id = models.AutoField(primary_key=True)
 
-#     class Meta:
-#         verbose_name_plural = "Employees"
-#         ordering = ['-created_at']
+    class Meta:
+        verbose_name_plural = "Employees"
+        ordering = ['-created_at']
 
-#     def __str__(self):
-#         return self.last_name
+    def __str__(self):
+        return self.first_name +" "+self.last_name
+    
 
 
 
