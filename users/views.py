@@ -1,4 +1,5 @@
 from rest_framework import viewsets,authentication,filters
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer,EmployeeSerializer,UserCreationSerializer,CustomUserSerializer,EmployeeListSerializer
 from .models import CustomUser,Employee
+from project.models import Projects
 from django.contrib.auth.models import Group
 import datetime
 from rest_framework.permissions import IsAuthenticated
@@ -37,6 +39,7 @@ class UserRegViewSet(ListCreateAPIView):
         if self.request.method == 'GET' and self.request.GET and self.request.GET['usertype'] =='emp':
             return CustomUser.objects.filter(is_emp=True,deleted_at__isnull=True)    
         return CustomUser.objects.filter(is_staff=True,deleted_at__isnull=True)
+        
 
     def perform_create(self, serializer):
         print("create user ...")
@@ -71,6 +74,14 @@ class EmployeeViewSet(ListCreateAPIView):
 
     def get_serializer_class(self):
         return EmployeeListSerializer if self.request.method == 'GET' else EmployeeSerializer
+    
+    def get_queryset(self):
+        print("get user ...")
+        if 'project' in self.request.GET:
+            project_id = self.request.GET['project']
+            project = get_object_or_404(Projects, pk=project_id)
+            return project.members.filter(deleted_at__isnull=True)    
+        return Employee.objects.filter(deleted_at__isnull=True)
     
     def create(self, request, *args, **kwargs):
        
