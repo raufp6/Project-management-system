@@ -65,6 +65,9 @@ class ProjectRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsStaffPermission]
     lookup_field = 'pk'
 
+    def get_serializer_class(self):
+        # Use ProjectListSerializer for list action
+        return ProjectListSerializer if self.request.method == 'GET' else ProjectSerializer
     def perform_destroy(self, instance):
         # Instead of deleting, update the deleted_at field
         instance.deleted_at = datetime.datetime.now().date()  # Make sure to import timezone
