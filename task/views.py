@@ -1,5 +1,5 @@
 from django.shortcuts import render,HttpResponse
-
+from django.http import JsonResponse
 # Create your views here.
 from rest_framework import viewsets,filters
 from rest_framework.decorators import api_view, permission_classes
@@ -162,3 +162,29 @@ class TaskFilesAPIView(ListAPIView):
     def get_queryset(self):
         task_id = self.kwargs['pk']
         return File.objects.filter(task_id=task_id)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_file(request, task_id):
+    if request.method == 'POST' and request.FILES.get('file'):
+        file_name = request.POST.get('file_name', 'Untitled') 
+        file_instance = File(task_id=task_id, file=request.FILES['file'],file_name=file_name)
+        
+        
+        file_instance.save()
+        serializer = FileSerializer(file_instance)
+        return JsonResponse(serializer.data, status=201)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_file(request, file_id):
+    try:
+        file_instance = File.objects.get(pk=file_id)
+        file_instance.delete()
+        return JsonResponse({'message': 'File deleted successfully'}, status=200)
+    except File.DoesNotExist:
+        return JsonResponse({'error': 'File not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

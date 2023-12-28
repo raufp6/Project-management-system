@@ -23,7 +23,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ['id', 'file', 'uploaded_at']
+        fields = ['id', 'file','file_name', 'uploaded_at']
 
 class TaskListSerializer(serializers.ModelSerializer):
     assigned_to = EmployeeSerializer(many=True)  
