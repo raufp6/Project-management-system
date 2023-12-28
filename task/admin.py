@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Task,BroadcastNotification
+from .models import Task,BroadcastNotification,File
 
 # Register your models here.
 admin.site.register(Task)
-admin.site.register(BroadcastNotification)
+admin.site.register(File)

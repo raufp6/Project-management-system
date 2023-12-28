@@ -4,11 +4,11 @@ from django.shortcuts import render,HttpResponse
 from rest_framework import viewsets,filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import Task
+from .models import Task,File
 from project.models import Projects
 from notification.models import Notification
-from .serializers import TaskSerializer,TaskListSerializer
-from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView
+from .serializers import TaskSerializer,TaskListSerializer,FileSerializer
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView,ListAPIView
 import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
@@ -65,7 +65,7 @@ class TaskView(ListCreateAPIView):
             return Task.objects.filter(project__in=client_projects)
 
         else:
-            return Task.objects.filter(deleted_at__isnull=True,assigned_to=user)
+            return Task.objects.filter(deleted_at__isnull=True,assigned_to=user.employee)
     
     def get_serializer_class(self):
         return TaskListSerializer if self.request.method == 'GET' else TaskSerializer
@@ -137,9 +137,9 @@ def task_count(request):
 
     else:
         if status:
-            count = Task.objects.filter(deleted_at__isnull=True,assigned_to=user,status=status).count()
+            count = Task.objects.filter(deleted_at__isnull=True,assigned_to=user.employee,status=status).count()
         else:
-            count = Task.objects.filter(deleted_at__isnull=True,assigned_to=user).count()
+            count = Task.objects.filter(deleted_at__isnull=True,assigned_to=user.employee).count()
     
     
     return Response({'count':count})
@@ -154,3 +154,11 @@ def get_notifications(request):
     serialized_notifications = serializer.data
     
     return Response(serialized_notifications)
+
+
+class TaskFilesAPIView(ListAPIView):
+    serializer_class = FileSerializer
+
+    def get_queryset(self):
+        task_id = self.kwargs['pk']
+        return File.objects.filter(task_id=task_id)
