@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 from client.models import Client
-from users.models import CustomUser
+from users.models import CustomUser,Employee
 
 
 STATUS = (
@@ -25,6 +25,7 @@ class Projects(models.Model):
     start_date = models.DateField(default=None,null=True,blank=True)
     deadline = models.DateField(default=None,null=True,blank=True)
     # project_created = models.DateTimeField(default=None,null=True,blank=True)
+    members = models.ManyToManyField(Employee)
     project_finished = models.DateTimeField(default=None,null=True,blank=True)
     progress = models.IntegerField(default=0)
     client = models.ForeignKey(Client,on_delete=models.CASCADE, null=True)
