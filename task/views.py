@@ -18,6 +18,8 @@ import json
 from asgiref.sync import async_to_sync
 from notification.serializers import NotificationSerializer
 # from notifications.signals import notify
+from notifications.signals import notify
+from django.db import transaction
 
 
 
@@ -28,22 +30,51 @@ def test(request):
 def test_notification(request):
     print("JJJJJJ")
     user = request.user
-    print(user.id)
-    channel_layer = get_channel_layer()
+    # print(user.id)
+    # channel_layer = get_channel_layer()
 
-    last_notification = Notification.objects.order_by('-timestamp').first()
+    # last_notification = Notification.objects.order_by('-timestamp').first()
 
-    serializer = NotificationSerializer(last_notification)
-    serialized_notification = serializer.data
+    # serializer = NotificationSerializer(last_notification)
+    # serialized_notification = serializer.data
     
-    async_to_sync(channel_layer.group_send)(
-        f"notification_63",
-        {
-            'command':'task_status',
-            'type': 'send_notification',
-            'message': json.dumps(serialized_notification)
-        }
-    )
+    # async_to_sync(channel_layer.group_send)(
+    #     f"notification_63",
+    #     {
+    #         'command':'task_status',
+    #         'type': 'send_notification',
+    #         'message': json.dumps(serialized_notification)
+    #     }
+    # )
+    task = Task.objects.get(pk=86)
+    print(task.assigned_to)
+
+    message = f"You have a new task: {task.title} from {task.added_by}"  # Customize as needed
+    for employee in task.assigned_to.all():
+        user_id = employee.user.id if employee.user else None
+        print("--in--")
+        print(user_id,"user")
+        notify.send(task.added_by, recipient=employee.user, verb='You have a new task', target=task)
+        
+        user_to_notify = user_id
+        
+        last_notification = Notification.objects.order_by('-timestamp').first()
+        
+
+        # Send notification to the user through WebSocket
+        channel_layer = get_channel_layer()
+        serializer = NotificationSerializer(last_notification)
+        serialized_notification = serializer.data
+        
+        async_to_sync(channel_layer.group_send)(
+            f"notification_{user_to_notify}",
+            {
+                'command':'task_status',
+                'type': 'send_notification',
+                'message': json.dumps(serialized_notification)
+            }
+        )
+    
     return HttpResponse("Notification send")
 
 
@@ -55,6 +86,9 @@ class TaskView(ListCreateAPIView):
     filterset_fields = '__all__' 
     search_fields = ['^title','^description']
 
+    def get_serializer_class(self):
+        return TaskListSerializer if self.request.method == 'GET' else TaskSerializer
+    
     def get_queryset(self):
         user = self.request.user
         print(user.is_superuser)
@@ -67,8 +101,7 @@ class TaskView(ListCreateAPIView):
         else:
             return Task.objects.filter(deleted_at__isnull=True,assigned_to=user.employee)
     
-    def get_serializer_class(self):
-        return TaskListSerializer if self.request.method == 'GET' else TaskSerializer
+    
 
     def create(self, request, *args, **kwargs):
 
@@ -76,8 +109,16 @@ class TaskView(ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
+        with transaction.atomic():
+            # Ensure assigned_to field is set correctly during task creation
+            assigned_to_data = request.data.get('assigned_to', [])
+            task = serializer.save(assigned_to=assigned_to_data)
+
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=201, headers=headers)
+        return Response(self.get_serializer(task).data, status=201, headers=headers)
+
+        # headers = self.get_success_headers(serializer.data)
+        # return Response(serializer.data, status=201, headers=headers)
     
     # def list(self, request, *args, **kwargs):
     #     # Override list method if needed

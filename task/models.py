@@ -5,11 +5,11 @@ from django.utils import timezone
 from datetime import date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_celery_beat.models import MINUTES, PeriodicTask, CrontabSchedule, PeriodicTasks
+
 import json
-import channels.layers
+
 from asgiref.sync import async_to_sync
-from notifications.signals import notify
+
 from notification.models import Notification
 from notification.serializers import NotificationSerializer
 STATUS = (
@@ -27,7 +27,7 @@ PRIORITY = (
 class Task(models.Model):
     project = models.ForeignKey(Projects,on_delete=models.CASCADE,related_name="project")
     # assigned_to = models.ForeignKey(CustomUser,null=True, blank=True,on_delete=models.SET_NULL,related_name="tasks")
-    assigned_to = models.ManyToManyField(Employee)
+    assigned_to = models.ManyToManyField(Employee,related_name="task_of")
     title = models.CharField(max_length=100,default="Task Title")
     description = models.TextField(max_length=300,default=None,null=True,blank=True)
     start_date = models.DateField(default=None,null=True,blank=True)
@@ -48,30 +48,7 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
-# @receiver(post_save, sender=Task)
-# def create_project_notification(sender, instance, created, **kwargs):
-#     if created:
-#         message = f"You have a new task: {instance.title} from {instance.added_by}"  # Customize as needed
-#         notify.send(instance.added_by, recipient=instance.assigned_to, verb='You have a new task', target=instance)
-        
-#         user_to_notify = instance.assigned_to
-#         print(user_to_notify.id)
-#         last_notification = Notification.objects.order_by('-timestamp').first()
-        
 
-#         # Send notification to the user through WebSocket
-#         channel_layer = channels.layers.get_channel_layer()
-#         serializer = NotificationSerializer(last_notification)
-#         serialized_notification = serializer.data
-        
-#         async_to_sync(channel_layer.group_send)(
-#             f"notification_{user_to_notify.id}",
-#             {
-#                 'command':'task_status',
-#                 'type': 'send_notification',
-#                 'message': json.dumps(serialized_notification)
-#             }
-#         )
         
 class File(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="files")
