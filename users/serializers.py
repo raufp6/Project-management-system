@@ -35,7 +35,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'email', 'groups']
+        fields = ['id', 'username', 'password', 'email', 'groups','first_name','last_name','profile_pic']
 
 class UserCreationSerializer(serializers.ModelSerializer):
     class Meta:

@@ -12,7 +12,7 @@ urlpatterns = [
     path('group/',GroupViewSet.as_view(),name='user-group'),
     path('create/',EmployeeViewSet.as_view(),name='create-user'),
     path('<int:pk>',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-detail"),
-    path('<int:pk>/update/',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-detail"),
+    path('<int:pk>/update/',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-update"),
     path('<int:pk>/delete/',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-detail"),
     path('count/', views.user_count, name='user_count'),
 
