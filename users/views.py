@@ -2,10 +2,10 @@ from rest_framework import viewsets,authentication,filters
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer,EmployeeSerializer,UserCreationSerializer,CustomUserSerializer,EmployeeListSerializer
+from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer,EmployeeSerializer,UserCreationSerializer,CustomUserSerializer,EmployeeListSerializer,ChangePasswordSerializer
 from .models import CustomUser,Employee
 from project.models import Projects
 from django.contrib.auth.models import Group
@@ -14,6 +14,9 @@ from rest_framework.permissions import IsAuthenticated
 from api.permissions import IsStaffPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import PermissionDenied
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from rest_framework import status
 
 
 class GroupViewSet(ListCreateAPIView):
@@ -177,3 +180,61 @@ def user_count(request):
     count = CustomUser.objects.count()
     
     return Response({'count':count})
+"""
+PASSWORD REST FOR LOGGED USER
+"""
+class PasswordChangeView(UpdateAPIView):
+    model = CustomUser
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.POST)
+        if serializer.is_valid():
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+            new_password2 = serializer.validated_data['new_password2']
+            print(new_password2)
+            # print(request.data.get('new_password2'))
+
+
+            # Check if the old password is correct
+            if not request.user.check_password(old_password):
+                return Response({'error': 'Old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Change the user's password
+            form = PasswordChangeForm(user=request.user, data={'old_password':old_password,'new_password1': new_password, 'new_password2': new_password2})
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)  # Important to maintain the user's session
+                return Response({'message': 'Password successfully changed.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid input data.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get_object(self, queryset=None):
+            obj = self.request.user
+            return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

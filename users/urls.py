@@ -2,7 +2,7 @@ from django.urls import path,include
 from . import views
 
 
-from .views import GroupViewSet,UserRegViewSet,UserRetrieveUpdateDestroyAPIView,EmployeeViewSet,EmployeeRetrieveUpdateDestroyAPIView
+from .views import GroupViewSet,UserRegViewSet,UserRetrieveUpdateDestroyAPIView,EmployeeViewSet,EmployeeRetrieveUpdateDestroyAPIView,PasswordChangeView
 
 urlpatterns = [
     path('',UserRegViewSet.as_view(),name='user'),
@@ -15,6 +15,8 @@ urlpatterns = [
     path('<int:pk>/update/',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-update"),
     path('<int:pk>/delete/',UserRetrieveUpdateDestroyAPIView.as_view(),name="user-detail"),
     path('count/', views.user_count, name='user_count'),
+    path('password-change/',PasswordChangeView.as_view(),name='password-change')
+    
 
 ]
 

@@ -66,3 +66,12 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         model= Employee
         fields = '__all__'
 
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = CustomUser
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+
+
