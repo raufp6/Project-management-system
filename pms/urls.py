@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/project/',include("project.urls")),
     path('api/task/',include("task.urls")),
     path('api/user/',include("users.urls")),
+    path('api/chats/',include("chat.urls")),
+
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=0),

@@ -11,6 +11,8 @@ import os
 import django
 from channels.routing import ProtocolTypeRouter,URLRouter
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pms.settings')
@@ -20,6 +22,7 @@ from channels.auth import AuthMiddleware,AuthMiddlewareStack
 
 from task.routing import websocket_urlpatterns
 from notification.routing import websocket_urlpatterns as notification_urls
+from chat.routing import websocket_urlpatterns as chat_urls
 
 
 application = ProtocolTypeRouter({
@@ -27,7 +30,8 @@ application = ProtocolTypeRouter({
     "websocket":AuthMiddlewareStack(
         URLRouter(
             websocket_urlpatterns+
-            notification_urls
+            notification_urls+
+            chat_urls
         )
     )
 })

@@ -30,18 +30,45 @@ class GroupViewSet(ListCreateAPIView):
 
 class UserRegViewSet(ListCreateAPIView):
     
-    # queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.all()
     filter_backends = [DjangoFilterBackend,filters.SearchFilter]
-    filterset_fields = '__all__' 
+    filterset_fields = ['first_name','last_name','username','email']
     search_fields = ['^username','^email']
     serializer_class = UserRegistrationSerializer
     permission_classes = [IsStaffPermission]
 
+
+    # def get_queryset(self):
+    #     excludeUsersArr = []
+    #     try:
+    #         excludeUsers = self.request.query_params.get('exclude')
+    #         if excludeUsers:
+    #             userIds = excludeUsers.split(',')
+    #             for userId in userIds:
+    #                 excludeUsersArr.append(int(userId))
+    #     except:
+    #         return []
+    #     return super().get_queryset().exclude(id__in=excludeUsersArr)
+    
     def get_queryset(self):
         print("get user ...")
-        if self.request.method == 'GET' and self.request.GET and self.request.GET['usertype'] =='emp':
-            return CustomUser.objects.filter(is_emp=True,deleted_at__isnull=True)    
-        return CustomUser.objects.filter(is_staff=True,deleted_at__isnull=True)
+        excludeUsersArr = []
+        try:
+            excludeUsers = self.request.query_params.get('exclude')
+            if excludeUsers:
+                userIds = excludeUsers.split(',')
+                for userId in userIds:
+                    excludeUsersArr.append(int(userId))
+        except:
+            pass
+
+        usertype = self.request.query_params.get('usertype')
+        excludeUsers = self.request.query_params.get('exclude')
+        print(usertype)
+        if usertype =='emp':
+            return CustomUser.objects.filter(is_emp=True,deleted_at__isnull=True).exclude(id__in=excludeUsersArr)
+        
+        return CustomUser.objects.filter(is_staff=True,deleted_at__isnull=True).exclude(id__in=excludeUsersArr)
         
 
     def perform_create(self, serializer):

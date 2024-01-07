@@ -56,6 +56,12 @@ class Employee(models.Model):
         return self.first_name +" "+self.last_name
     
 
+class OnlineUser(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.first_name
+
 
 
 
