@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'users',
     'client',
     'project',
-    'snippet',
+    # 'snippet',
     'task',
     'notification',
     'chat',

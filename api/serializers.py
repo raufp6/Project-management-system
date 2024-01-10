@@ -3,8 +3,7 @@ from rest_framework.serializers import ModelSerializer, ValidationError, ImageFi
 from users.models import CustomUser
 from client.models import Client
 from project.models import Projects
-from snippet.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
-from snippet.models import Snippet
+
 from django.contrib.auth.models import Group
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
