@@ -23,15 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = os.getenv('SECRET_KEY')
-SECRET_KEY = "django-insecure-^oc1zb%h(-+rroekwm#60#mx)(mndpa_f1-+@dq$@*2#7d4x9q"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.getenv('DEBUG')
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
-# ALLOWED_HOSTS = ["51.20.70.142","localhost","127.0.0.1:8000"]
-ALLOWED_HOSTS = ['65.1.106.129']
+ALLOWED_HOSTS = ["65.1.106.129","localhost","127.0.0.1"]
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -46,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
 
     'api',
     'users',
@@ -68,6 +66,20 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
 ]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
+]
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
@@ -119,17 +131,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
-]
+
 
 ROOT_URLCONF = 'pms.urls'
 
@@ -170,18 +172,13 @@ DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 #         'NAME': 'pms',
-#         'USER': 'pmsuser',
-#         'PASSWORD': 'vbnm',
-#         'HOST': 'localhost',
+#         'USER': 'superuser',
+#         'PASSWORD': 'Ra123uof',
+#         'HOST': 'pmsdev.cl4m08c4oonb.eu-north-1.rds.amazonaws.com',
 #         'PORT': '5432',
 #     }
 # }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# } 
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -221,6 +218,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+
 
 STATIC_URL = 'static/'
 
