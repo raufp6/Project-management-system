@@ -168,16 +168,7 @@ DATABASES = {
         'PORT': os.getenv('DATABASE_PORT'),
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'pms',
-#         'USER': 'superuser',
-#         'PASSWORD': 'Ra123uof',
-#         'HOST': 'pmsdev.cl4m08c4oonb.eu-north-1.rds.amazonaws.com',
-#         'PORT': '5432',
-#     }
-# }
+
 
 
 # Password validation
