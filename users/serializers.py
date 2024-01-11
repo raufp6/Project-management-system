@@ -36,6 +36,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'password', 'email', 'groups','first_name','last_name','profile_pic']
+        extra_kwargs = {'profile_pic': {'required': False}}
+
+
 
 class UserCreationSerializer(serializers.ModelSerializer):
     class Meta:

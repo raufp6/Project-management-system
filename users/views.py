@@ -99,7 +99,7 @@ class EmployeeViewSet(ListCreateAPIView):
     lookup_field = 'pk'
     permission_classes = [IsStaffPermission]
     filter_backends = [DjangoFilterBackend,filters.SearchFilter]
-    filterset_fields = ['first_name','last_name','status']
+    filterset_fields = ['user__first_name','user__last_name','status']
 
 
     def get_serializer_class(self):
@@ -120,16 +120,19 @@ class EmployeeViewSet(ListCreateAPIView):
         user_data = {
             'username': request.data.get('username'),
             'password': request.data.get('password'),
+            'first_name': request.data.get('first_name'),
+            'last_name': request.data.get('last_name'),
             'email': request.data.get('email'),
+            # 'profile_pic': request.data.get('profile_pic'),
             'is_staff':True,
             'is_emp':True,
             'groups':request.data.getlist('groups')
         }
         employee_data = {
-            'first_name': request.data.get('first_name'),
-            'last_name': request.data.get('last_name'),
+            # 'first_name': request.data.get('first_name'),
+            # 'last_name': request.data.get('last_name'),
             'phone': request.data.get('phone'),
-            'profile_pic': request.data.get('profile_pic'),
+            # 'profile_pic': request.data.get('profile_pic'),
             'joined_date': request.data.get('joined_date'),
             
         }
@@ -140,23 +143,28 @@ class EmployeeViewSet(ListCreateAPIView):
         # groups = Group.objects.filter(pk__in=group_ids)
 
         user_serializer = UserRegistrationSerializer(data=user_data)
-        user_serializer.is_valid(raise_exception=True)
-        user = user_serializer.save()
-        user.set_password(user_data['password'])
-        # user.groups.set(groups)  # Set the groups for the user
-        user.save()
+        # user_serializer.is_valid(raise_exception=True)
+        if user_serializer.is_valid():
+            user = user_serializer.save()
+            user.set_password(user_data['password'])
+            # user.groups.set(groups)  # Set the groups for the user
+            user.save()
+            
 
-
-        # Add the user to the client data and create the client
-        # client_data = request.data
-        employee_data['user'] = user.id
-
-        serializer = self.get_serializer(data=employee_data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=201, headers=headers)
+            
+            # employee_serializer.is_valid(raise_exception=True)
+            employee_data['user'] = user.id
+            employee_serializer = self.get_serializer(data=employee_data)
+            if employee_serializer.is_valid():
+                self.perform_create(employee_serializer)
+                headers = self.get_success_headers(employee_serializer.data)
+                return Response(employee_serializer.data, status=201, headers=headers)
+            else:
+                # Rollback user creation in case of employee validation failure
+                user.delete()
+                return Response({'error': employee_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': user_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
 class EmployeeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     # serializer_class = EmployeeSerializer
@@ -184,7 +192,8 @@ class EmployeeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
             'username': self.request.data.get('username'),
             # 'password': self.request.data.get('password'),
             'email': self.request.data.get('email'),
-            
+            'first_name':self.request.data.get('first_name'),
+            'last_name':self.request.data.get('last_name'),
             'groups':self.request.data.getlist('groups')
         }
         print(self.request.data.getlist('groups'))

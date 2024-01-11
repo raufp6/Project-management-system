@@ -33,14 +33,16 @@ class CustomUser(AbstractUser):
 
 
 
+def generate_emp_id():
+    return uuid.uuid4().hex[:10].upper()
 
 class Employee(models.Model):
-    emp_id = models.CharField(default=uuid.uuid4().hex[:10].upper(), max_length=50, editable=False)
+    emp_id = models.CharField(default=generate_emp_id, max_length=50, editable=False)
     user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    # first_name = models.CharField(max_length=50)
+    # last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=20, default=None,null=True,blank=True)
-    profile_pic = models.ImageField(upload_to="uploads/emp/",default="uploads/user.png")
+    # profile_pic = models.ImageField(upload_to="uploads/emp/",default="uploads/user.png")
     joined_date = models.DateField(null=True,blank=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(null=True, blank=True,auto_now_add=True)
@@ -53,7 +55,7 @@ class Employee(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return self.first_name +" "+self.last_name
+        return self.user.first_name +" "+self.user.last_name
     
 
 class OnlineUser(models.Model):
