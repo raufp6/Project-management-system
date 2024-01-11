@@ -92,6 +92,9 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         # Instead of deleting, update the deleted_at field
         instance.deleted_at = datetime.datetime.now().date()  # Make sure to import timezone
         instance.save()
+        employee = Employee.objects.get(pk=instance.emplyee.id)
+        employee.deleted_at = datetime.datetime.now().date()
+        employee.save()
 
 class EmployeeViewSet(ListCreateAPIView):
     # serializer_class = EmployeeSerializer
@@ -123,7 +126,7 @@ class EmployeeViewSet(ListCreateAPIView):
             'first_name': request.data.get('first_name'),
             'last_name': request.data.get('last_name'),
             'email': request.data.get('email'),
-            # 'profile_pic': request.data.get('profile_pic'),
+            'profile_pic': request.data.get('profile_pic'),
             'is_staff':True,
             'is_emp':True,
             'groups':request.data.getlist('groups')
@@ -181,10 +184,7 @@ class EmployeeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
         # Update CustomUser fields
         
-        profile_pic = self.request.data.get('profile_pic', None)
-        if profile_pic:
-            print("None")
-            employee_instance.profile_pic = profile_pic
+        
         serializer.save()
 
         user_instance = employee_instance.user
@@ -196,6 +196,10 @@ class EmployeeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
             'last_name':self.request.data.get('last_name'),
             'groups':self.request.data.getlist('groups')
         }
+        profile_pic = self.request.data.get('profile_pic', None)
+        if profile_pic:
+            user_data['profile_pic'] = profile_pic
+
         print(self.request.data.getlist('groups'))
         user_serializer = CustomUserSerializer(user_instance, data=user_data, partial=True)
         user_serializer.is_valid(raise_exception=True)

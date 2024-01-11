@@ -38,7 +38,7 @@ def generate_emp_id():
 
 class Employee(models.Model):
     emp_id = models.CharField(default=generate_emp_id, max_length=50, editable=False)
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None)
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,default=None,related_name="emplyee")
     # first_name = models.CharField(max_length=50)
     # last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=20, default=None,null=True,blank=True)
