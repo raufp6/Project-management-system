@@ -168,10 +168,6 @@ DATABASES = {
         'PORT': os.getenv('DATABASE_PORT'),
     }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> development
 
 
 # Password validation
