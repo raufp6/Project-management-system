@@ -221,7 +221,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # The domain of your frontend application
+    "http://localhost:3000",
+    "https://project-management-system-frontend-k5l4qwugd-raufp6s-projects.vercel.app"
 ]
 CORS_ALLOW_METHODS = [
     "GET",
