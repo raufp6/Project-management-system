@@ -2,7 +2,7 @@ from rest_framework import viewsets,authentication,filters
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView,UpdateAPIView,ListAPIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer,GroupSerializer,UserRegistrationSerializer,EmployeeSerializer,UserCreationSerializer,CustomUserSerializer,EmployeeListSerializer,ChangePasswordSerializer
@@ -56,6 +56,7 @@ class UserRegViewSet(ListCreateAPIView):
         try:
             excludeUsers = self.request.query_params.get('exclude')
             if excludeUsers:
+                print("exlude")
                 userIds = excludeUsers.split(',')
                 for userId in userIds:
                     excludeUsersArr.append(int(userId))
@@ -68,7 +69,7 @@ class UserRegViewSet(ListCreateAPIView):
         if usertype =='emp':
             return CustomUser.objects.filter(is_emp=True,deleted_at__isnull=True).exclude(id__in=excludeUsersArr)
         
-        return CustomUser.objects.filter(is_staff=True,deleted_at__isnull=True).exclude(id__in=excludeUsersArr)
+        return CustomUser.objects.filter(deleted_at__isnull=True).exclude(id__in=excludeUsersArr)
         
 
     def perform_create(self, serializer):
@@ -78,6 +79,20 @@ class UserRegViewSet(ListCreateAPIView):
         user.is_emp = True
         # user.groups = list(self.request.data.get('group'))
         user.save()
+
+
+class MyChatUsers(ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsStaffPermission]
+
+
+    def get_queryset(self):
+        user = self.request.user
+        print("get method chat")
+        if user.is_emp:
+            return CustomUser.objects.filter(is_emp=True,deleted_at__isnull=True)
+        return CustomUser.objects.filter(deleted_at__isnull=True)
 
     
 
@@ -92,7 +107,7 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         # Instead of deleting, update the deleted_at field
         instance.deleted_at = datetime.datetime.now().date()  # Make sure to import timezone
         instance.save()
-        employee = Employee.objects.get(pk=instance.emplyee.id)
+        employee = Employee.objects.get(pk=instance.employee.id)
         employee.deleted_at = datetime.datetime.now().date()
         employee.save()
 
