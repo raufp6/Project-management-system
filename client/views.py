@@ -31,6 +31,9 @@ class CreateClientView(ListCreateAPIView):
             'username': request.data.get('username'),
             'password': request.data.get('password'),
             'email': request.data.get('email'),
+            'first_name':request.data.get('username'),
+            'last_name':request.data.get('username'),
+            'is_client':True
         }
         client_data = {
             'company_name': request.data.get('company_name'),
@@ -38,7 +41,7 @@ class CreateClientView(ListCreateAPIView):
             'phone': request.data.get('phone'),
             'contact_person': request.data.get('contact_person'),
             'website': request.data.get('website'),
-            'is_client':True
+            
             
         }
 

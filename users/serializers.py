@@ -35,7 +35,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'email', 'groups','first_name','last_name','profile_pic']
+        fields = ['id', 'username', 'password', 'email', 'groups','first_name','last_name','profile_pic','is_emp','is_client','is_staff']
         extra_kwargs = {'profile_pic': {'required': False}}
 
 
@@ -43,7 +43,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'password', 'email']
+        fields = ['username', 'password', 'email','is_client']
 
 class EmployeeSerializer(serializers.ModelSerializer):
     profile_pic = serializers.ImageField(required=False)
