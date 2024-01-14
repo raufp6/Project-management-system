@@ -149,3 +149,4 @@ xhtml2pdf==0.2.11
 yarg==0.1.9
 zipp==3.1.0
 zope.interface==6.1
+boto3
