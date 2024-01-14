@@ -223,7 +223,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://project-management-system-frontend-k5l4qwugd-raufp6s-projects.vercel.app",
-    "https://project-management-system-frontend.vercel.app"
+    "https://project-management-system-frontend.vercel.app",
+    "https://pms.finease.uk" 
 ]
 CORS_ALLOW_METHODS = [
     "GET",
