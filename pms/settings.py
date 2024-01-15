@@ -220,13 +220,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# CORS_ALLOWED_ORIGINS = [
-#     "https://pms.finease.uk",
-#     "https://main--heartfelt-vacherin-5b221f.netlify.app",
-#     "http://localhost:3000",
-#     "https://project-management-system-frontend-k5l4qwugd-raufp6s-projects.vercel.app",
-#     "https://project-management-system-frontend.vercel.app",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://pms.finease.uk",
+    # "https://main--heartfelt-vacherin-5b221f.netlify.app",
+    # "http://localhost:3000",
+    # "https://project-management-system-frontend-k5l4qwugd-raufp6s-projects.vercel.app",
+    # "https://project-management-system-frontend.vercel.app",
+]
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
@@ -244,6 +244,7 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
 }
 
+CSRF_COOKIE_SECURE = False
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOW_CREDENTIALS = True
 
