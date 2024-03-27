@@ -245,7 +245,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 CSRF_COOKIE_SECURE = False
-CSRF_TRUSTED_ORIGINS = ['https://*.visitkeralaonline.com','https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['http://43.204.36.68','https://*.visitkeralaonline.com','https://*.127.0.0.1']
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOW_CREDENTIALS = True
 
